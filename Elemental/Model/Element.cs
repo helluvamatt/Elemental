@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Collections.Generic;
 
 namespace Elemental.Model
 {
@@ -14,7 +9,8 @@ namespace Elemental.Model
 			Sources = new List<ElementPair>();
 		}
 
-		public string Id { get; set; }
+		public int Id { get; set; }
+		public bool Prime { get; set; }
 		public string Name { get; set; }
 		public string Icon { get; set; }
 		public List<ElementPair> Sources { get; private set; }
