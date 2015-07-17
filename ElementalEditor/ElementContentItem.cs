@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Elemental
+namespace ElementalEditor
 {
 	public class ElementContentItem : ContentControl
 	{
@@ -71,6 +71,14 @@ namespace Elemental
 					return bi;
 				}
 				return null;
+			}
+		}
+
+		public string SourcesCount
+		{
+			get
+			{
+				return string.Format("{0} combinations", Element.Sources != null ? Element.Sources.Count : 0);
 			}
 		}
 	}

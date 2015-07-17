@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LoadTitle" xml:space="preserve">
-    <value>Load Saved Game...</value>
+    <value>Open Database...</value>
   </data>
   <data name="Question" xml:space="preserve">
     <value>Question</value>
   </data>
   <data name="SaveQuestion" xml:space="preserve">
-    <value>Do you want to save your progress?</value>
+    <value>Do you want to save changes to the database?</value>
   </data>
   <data name="SaveTitle" xml:space="preserve">
-    <value>Save Game...</value>
+    <value>Save Database...</value>
   </data>
 </root>

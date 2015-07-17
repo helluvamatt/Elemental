@@ -1,0 +1,51 @@
+﻿<Window x:Class="ElementalEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ElementalEditor"
+        mc:Ignorable="d"
+        Title="Elemental Database Editor" Height="600" Width="800" MinHeight="600" MinWidth="800"
+		Loaded="Window_Loaded"
+		Closing="Window_Closing">
+    <DockPanel>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="_File">
+				<MenuItem Header="_New">
+					<MenuItem Header="_Database..." Click="MenuItem_File_New_Database_Click" />
+					<MenuItem Name="MenuItem_File_New_Element" Header="Element..." IsEnabled="False" Click="MenuItem_File_New_Element_Click" />
+				</MenuItem>
+				<MenuItem Header="_Open Database..." Click="MenuItem_File_OpenDatabase_Click"/>
+				<MenuItem Name="MenuItem_File_CloseDatabase" Header="_Close Database" Click="MenuItem_File_CloseDatabase_Click" />
+				<Separator />
+				<MenuItem Header="_Quit" Click="MenuItem_File_Quit_Click" />
+			</MenuItem>
+			<MenuItem Header="_Edit">
+				<MenuItem Header="Duplicate" Name="MenuItem_Edit_Duplicate" Click="MenuItem_Edit_Duplicate_Click" IsEnabled="False" />
+				<Separator />
+				<MenuItem Header="Delete" Name="MenuItem_Edit_Delete" Click="MenuItem_Edit_Delete_Click" IsEnabled="False" />
+			</MenuItem>
+		</Menu>
+		<DataGrid Name="ElementData" AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" SelectionChanged="ElementData_SelectionChanged" IsReadOnly="True">
+			<DataGrid.Resources>
+				<Style TargetType="DataGridRow">
+					<EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick" />
+				</Style>
+			</DataGrid.Resources>
+			<DataGrid.Columns>
+				<DataGridTemplateColumn Header="Icon" Width="100">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<StackPanel>
+								<Image Source="{Binding Path=IconSource}" HorizontalAlignment="Center" Stretch="None" />
+							</StackPanel>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn Header="Name" Binding="{Binding Path=Element.Name}" Width="0.5*" />
+				<DataGridTextColumn Header="Number of Combinations" Binding="{Binding Path=SourcesCount}" Width="0.4*" />
+				<DataGridCheckBoxColumn Header="Prime" Binding="{Binding Path=Element.Prime}" Width="0.1*" />
+			</DataGrid.Columns>
+		</DataGrid>
+    </DockPanel>
+</Window>

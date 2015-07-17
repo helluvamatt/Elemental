@@ -1,9 +1,11 @@
-﻿using Elemental.Model;
+﻿using Elemental.Data;
+using Elemental.Data.Model;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -30,11 +32,25 @@ namespace Elemental
 			_ElementDatabase.DatabaseLoaded += _ElementDatabase_DatabaseLoaded;
 			_ElementDatabase.DatabaseError += _ElementDatabase_DatabaseError;
 			_ElementDatabase.DiscoveredElementsChanged += _ElementDatabase_DiscoveredElementsChanged;
+			_ElementDatabase.ProgressLoaded += _ElementDatabase_ProgressLoaded;
+			_ElementDatabase.ProgressSaved += _ElementDatabase_ProgressSaved;
+
+			_LastLocation = ExePath;
 		}
 
-		private const string DRAGDROP_DATA = "ElementId";
+		private string ExePath
+		{
+			get
+			{
+				return System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Uri.UnescapeDataString(new Uri(Assembly.GetEntryAssembly().CodeBase).AbsolutePath)));
+			}
+		}
 
 		private ElementDatabase _ElementDatabase;
+
+		private string _LastLocation;
+		private string _CurrentSaveGameFile;
+		private Action _AfterSaveAction;
 
 		private Point _MouseStartPoint;
 		private Point _ItemStartPoint;
@@ -49,16 +65,107 @@ namespace Elemental
 			_ElementDatabase.LoadDatabaseAsync("elements.json");
 		}
 
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if (_ElementDatabase.ProgressDirty)
+			{
+				var result = MessageBox.Show(this, Properties.Resources.SaveQuestion, Properties.Resources.Question, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+				switch (result)
+				{
+					case MessageBoxResult.Yes:
+						_AfterSaveAction = () => Close();
+						e.Cancel = true;
+						AttemptSave();
+						break;
+					case MessageBoxResult.No:
+						// Just quit, lose progress
+						break;
+					case MessageBoxResult.Cancel:
+						// Don't save, but cancel
+						e.Cancel = true;
+						break;
+				}
+			}
+		}
+
+		private void MenuItem_File_NewGame_Click(object sender, RoutedEventArgs e)
+		{
+			if (_ElementDatabase.ProgressDirty)
+			{
+				var result = MessageBox.Show(this, Properties.Resources.SaveQuestion, Properties.Resources.Question, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+				switch (result)
+				{
+					case MessageBoxResult.Yes:
+						_AfterSaveAction = () => DoNewGame();
+						AttemptSave();
+						break;
+					case MessageBoxResult.No:
+						DoNewGame();
+						break;
+					case MessageBoxResult.Cancel:
+						break;
+				}
+			}
+			else
+			{
+				DoNewGame();
+			}
+		}
+
+		private void MenuItem_File_LoadGame_Click(object sender, RoutedEventArgs e)
+		{
+			if (_ElementDatabase.ProgressDirty)
+			{
+				var result = MessageBox.Show(this, Properties.Resources.SaveQuestion, Properties.Resources.Question, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+				switch (result)
+				{
+					case MessageBoxResult.Yes:
+						_AfterSaveAction = () => DoLoad();
+						AttemptSave();
+						break;
+					case MessageBoxResult.No:
+						DoLoad();
+						break;
+					case MessageBoxResult.Cancel:
+						break;
+				}
+			}
+			else
+			{
+				DoLoad();
+			}
+		}
+
+		private void MenuItem_File_SaveGame_Click(object sender, RoutedEventArgs e)
+		{
+			AttemptSave();
+		}
+
+		private void MenuItem_File_SaveGameAs_Click(object sender, RoutedEventArgs e)
+		{
+			DoSaveAs();
+		}
+
+		private void MenuItem_File_Preferences_Click(object sender, RoutedEventArgs e)
+		{
+			// TODO Show preferences dialog
+		}
+
+		private void MenuItem_File_Quit_Click(object sender, RoutedEventArgs e)
+		{
+			Close();
+		}
+
 		private void _ElementDatabase_DatabaseError(Exception ex)
 		{
 			// TODO Hide loading
-			MessageBox.Show(string.Format("Failed to load element data: {0}", ex.Message), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		private void _ElementDatabase_DatabaseLoaded()
 		{
 			// TODO Hide loading
-			AddBaseElements(Width / 2, Height / 2);
+			DoNewGame();
 		}
 
 		private void _ElementDatabase_DiscoveredElementsChanged(List<Element> knownElements)
@@ -66,9 +173,33 @@ namespace Elemental
 			Toolbox.ItemsSource = knownElements;
 		}
 
+		private void _ElementDatabase_ProgressSaved()
+		{
+			// TODO Notify Progress saved
+
+			// Perform the AfterSaveAction
+			if (_AfterSaveAction != null)
+			{
+				_AfterSaveAction.Invoke();
+				_AfterSaveAction = null;
+			}
+		}
+
+		private void _ElementDatabase_ProgressLoaded(List<ElementDatabase.SavedProgress.ElementOnWorkbench> obj)
+		{
+			// Populate workbench
+			ClearAllElements();
+			double sX = (Workbench.ActualWidth + Sidebar.ActualWidth) / 2;
+			double sY = Workbench.ActualHeight / 2;
+			foreach (var element in obj)
+			{
+				Point clipped = ClipPoint(new Point(element.X, element.Y));
+				AddElement(sX, sY, clipped.X, clipped.Y, element.Element);
+			}
+        }
+
 		private void Workbench_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			Console.WriteLine("Workbench_MouseDown called");
 			if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
 			{
 				Point mousePos = e.GetPosition(null);
@@ -77,6 +208,7 @@ namespace Elemental
 			else if (e.ChangedButton == MouseButton.Right)
 			{
 				// TODO Possible handle a context menu?
+				Console.WriteLine("Right-click detected...");
 			}
 		}
 
@@ -194,7 +326,6 @@ namespace Elemental
 
 		private void Element_MouseDown(object sender, MouseEventArgs e)
 		{
-			Console.WriteLine("Element_MouseDown called");
 			var item = e.Source as ElementContentItem;
 			if (item != null)
 			{
@@ -207,20 +338,18 @@ namespace Elemental
 
 		private void Element_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			Console.WriteLine("Element_MouseDoubleClick called");
 			var item = e.Source as ElementContentItem;
 			double offset = 20;
 			double fromX = Canvas.GetLeft(item);
 			double fromY = Canvas.GetTop(item);
 			double toX = fromX + offset;
 			double toY = fromY + offset;
-			AddElementClone(fromX, fromY, toX, toY, item.Element);
+			AddElement(fromX, fromY, toX, toY, item.Element);
 			e.Handled = true;
 		}
 
 		private void ElementContentItem_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			Console.WriteLine("ElementContentItem_MouseDown called");
 			var item = sender as ElementContentItem;
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
@@ -236,17 +365,90 @@ namespace Elemental
 
 		private void ElementContentItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			Console.WriteLine("ElementContentItem_MouseDoubleClick called");
 			var item = e.Source as ElementContentItem;
 			Point p = item.TranslatePoint(new Point(0, 0), Workbench);
 			Point center = new Point(Workbench.ActualWidth / 2, Workbench.ActualHeight / 2);
-			AddElementClone(p.X, p.Y, center.X, center.Y, item.Element);
+			AddElement(p.X, p.Y, center.X, center.Y, item.Element);
+			e.Handled = true;
+		}
+
+		private void RecycleBin_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
+			{
+				ClearAllElements();
+			}
+			else if (e.ChangedButton == MouseButton.Right)
+			{
+				// TODO Possible handle a context menu?
+				Console.WriteLine("Right-click on Recycle Bin detected...");
+			}
 			e.Handled = true;
 		}
 
 		#endregion
 
 		#region Utility methods
+
+		private void AttemptSave()
+		{
+			if (_CurrentSaveGameFile != null)
+			{
+				DoSave(_CurrentSaveGameFile);
+			}
+			else
+			{
+				DoSaveAs();
+			}
+		}
+
+		private void DoSaveAs()
+		{
+			SaveFileDialog saveDialog = new SaveFileDialog();
+			saveDialog.Title = Properties.Resources.SaveTitle;
+			saveDialog.InitialDirectory = _LastLocation;
+			saveDialog.CheckPathExists = true;
+			saveDialog.OverwritePrompt = true;
+			saveDialog.Filter = "JSON Files (.json)|*.json";
+			bool? isOk = saveDialog.ShowDialog(this);
+			if (isOk.HasValue && isOk.Value)
+			{
+				_CurrentSaveGameFile = saveDialog.FileName;
+				DoSave(_CurrentSaveGameFile);
+			}
+			else if (_AfterSaveAction != null)
+			{
+				_AfterSaveAction = null;
+			}
+		}
+
+		private void DoSave(string savedGameFile)
+		{
+			var workbenchState = Workbench.Children.OfType<ElementContentItem>().Select(item => new ElementDatabase.SavedProgress.ElementOnWorkbench { Element = item.Element, X = Canvas.GetLeft(item), Y = Canvas.GetTop(item) }).ToList();
+            _ElementDatabase.SaveProgressAsync(savedGameFile, workbenchState);
+		}
+
+		private void DoLoad()
+		{
+			OpenFileDialog openDialog = new OpenFileDialog();
+			openDialog.Title = Properties.Resources.LoadTitle;
+			openDialog.Multiselect = false;
+			openDialog.InitialDirectory = _LastLocation;
+			openDialog.CheckPathExists = true;
+			openDialog.Filter = "JSON Files (.json)|*.json";
+			bool? isOk = openDialog.ShowDialog(this);
+			if (isOk.HasValue && isOk.Value)
+			{
+				_CurrentSaveGameFile = openDialog.FileName;
+				_ElementDatabase.LoadProgressAsync(_CurrentSaveGameFile);
+			}
+		}
+
+		private void DoNewGame()
+		{
+			_ElementDatabase.NewProgress();
+			AddBaseElements(Workbench.ActualWidth / 2, Workbench.ActualHeight / 2);
+		}
 
 		private bool CollisionDetection(ElementContentItem item, Point point)
 		{
@@ -296,7 +498,16 @@ namespace Elemental
 			Canvas.SetZIndex(item, 1);
 		}
 
-		private void AddElementClone(double sX, double sY, double dX, double dY, Element element)
+		private void ClearAllElements()
+		{
+			// Delete all elements
+			foreach (UIElement uiElement in Workbench.Children.OfType<ElementContentItem>().ToList())
+			{
+				Workbench.Children.Remove(uiElement);
+			}
+		}
+
+		private void AddElement(double sX, double sY, double dX, double dY, Element element)
 		{
 			var clone = CreateItem(dX, dY, element);
 			Workbench.Children.Add(clone);

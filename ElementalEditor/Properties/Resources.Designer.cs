@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Elemental.Properties {
+namespace ElementalEditor.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Elemental.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Elemental.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ElementalEditor.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace Elemental.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load Saved Game....
+        ///   Looks up a localized string similar to Open Database....
         /// </summary>
         internal static string LoadTitle {
             get {
@@ -79,7 +79,7 @@ namespace Elemental.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to save your progress?.
+        ///   Looks up a localized string similar to Do you want to save changes to the database?.
         /// </summary>
         internal static string SaveQuestion {
             get {
@@ -88,7 +88,7 @@ namespace Elemental.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save Game....
+        ///   Looks up a localized string similar to Save Database....
         /// </summary>
         internal static string SaveTitle {
             get {

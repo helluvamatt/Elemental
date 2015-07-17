@@ -6,46 +6,62 @@
         xmlns:local="clr-namespace:Elemental"
         mc:Ignorable="d"
 		Loaded="Window_Loaded"
+		Closing="Window_Closing"
         Title="Elemental" Height="600" Width="800" MinHeight="600" MinWidth="800">
 
-	<Canvas Background="Transparent" Name="Workbench" MouseDown="Workbench_MouseDown" MouseMove="Workbench_MouseMove" MouseUp="Workbench_MouseUp">
-		<Canvas.Resources>
-			<!-- Element Item template -->
-			<ControlTemplate x:Key="ElementItemTemplate" TargetType="local:ElementContentItem">
-				<Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-					<Rectangle Name="BorderRect" Fill="Transparent" StrokeDashArray="1 2" Stroke="Black" />
-					<Image Source="{Binding Path=IconSource}" Width="48" Height="48" IsHitTestVisible="False" Margin="12,0,12,24" />
-					<Label Content="{Binding Path=Element.Name}" Width="72" Height="12" Padding="0,0,0,0" FontSize="10" HorizontalContentAlignment="Center" IsHitTestVisible="False" Margin="0,48,0,0" />
-				</Grid>
-			</ControlTemplate>
+	<DockPanel>
+		<Menu DockPanel.Dock="Top">			
+			<MenuItem Header="Game">
+				<MenuItem Header="_New Game" Click="MenuItem_File_NewGame_Click" InputGestureText="Ctrl+N" />
+				<Separator />
+				<MenuItem Header="_Open Game..." Click="MenuItem_File_LoadGame_Click" InputGestureText="Ctrl+O" />
+				<MenuItem Header="_Save Game" Click="MenuItem_File_SaveGame_Click" InputGestureText="Ctrl+S" />
+				<MenuItem Header="Save Game As..." Click="MenuItem_File_SaveGameAs_Click" InputGestureText="Ctrl+Shift+S" />
+				<Separator />
+				<MenuItem Header="_Preferences" Click="MenuItem_File_Preferences_Click" InputGestureText="Ctrl+P" />
+				<Separator />
+				<MenuItem Header="_Quit" Click="MenuItem_File_Quit_Click" InputGestureText="Alt+F4" />
+			</MenuItem>
+		</Menu>
+		<Canvas Background="Transparent" Name="Workbench" MouseDown="Workbench_MouseDown" MouseMove="Workbench_MouseMove" MouseUp="Workbench_MouseUp">
+			<Canvas.Resources>
+				<!-- Element Item template -->
+				<ControlTemplate x:Key="ElementItemTemplate" TargetType="local:ElementContentItem">
+					<Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+						<Rectangle Name="BorderRect" Fill="Transparent" StrokeDashArray="1 2" Stroke="Black" />
+						<Image Source="{Binding Path=IconSource}" Width="48" Height="48" IsHitTestVisible="False" Margin="12,0,12,24" />
+						<Label Content="{Binding Path=Element.Name}" Width="72" Height="12" Padding="0,0,0,0" FontSize="10" HorizontalContentAlignment="Center" IsHitTestVisible="False" Margin="0,48,0,0" />
+					</Grid>
+				</ControlTemplate>
 
-			<!-- Element List Item template -->
-			<DataTemplate x:Key="ElementListItemTemplate">
-				<local:ElementContentItem
-					Template="{StaticResource ElementItemTemplate}"
-					Element="{Binding Path=.}"
-					MouseDown="ElementContentItem_MouseDown"
-					MouseDoubleClick="ElementContentItem_MouseDoubleClick" />
-			</DataTemplate>
+				<!-- Element List Item template -->
+				<DataTemplate x:Key="ElementListItemTemplate">
+					<local:ElementContentItem
+						Template="{StaticResource ElementItemTemplate}"
+						Element="{Binding Path=.}"
+						MouseDown="ElementContentItem_MouseDown"
+						MouseDoubleClick="ElementContentItem_MouseDoubleClick" />
+				</DataTemplate>
 
-			<!-- UI Elements -->
-			<BitmapImage x:Key="Icon_Trash">/Elemental;component/icons/trash-icon.png</BitmapImage>
-		</Canvas.Resources>
+				<!-- UI Elements -->
+				<BitmapImage x:Key="Icon_Trash">/Elemental;component/icons/trash-icon.png</BitmapImage>
+			</Canvas.Resources>
 
-		<Grid Width="Auto" Height="{Binding ActualHeight, ElementName=Workbench}" Canvas.Left="0" Canvas.Top="0">
-			<DockPanel Margin="3">
-				<StackPanel Name="RecycleBin" Margin="0 0 0 3" DockPanel.Dock="Top">
-					<Image Source="{StaticResource Icon_Trash}" Stretch="None" />
-				</StackPanel>
-				<ListBox
-					Name="Toolbox"
-					HorizontalContentAlignment="Center"
-					HorizontalAlignment="Stretch"
-					VerticalAlignment="Stretch"
-					ItemTemplate="{StaticResource ElementListItemTemplate}"
-					/>
+			<Grid Name="Sidebar" Width="Auto" Height="{Binding ActualHeight, ElementName=Workbench}" Canvas.Left="0" Canvas.Top="0">
+				<DockPanel Margin="3">
+					<StackPanel Name="RecycleBin" Margin="0 0 0 3" DockPanel.Dock="Top" MouseDown="RecycleBin_MouseDown" ToolTip="Double-click to clear the workbench.">
+						<Image Source="{StaticResource Icon_Trash}" Stretch="None" IsHitTestVisible="True" />
+					</StackPanel>
+					<ListBox
+						Name="Toolbox"
+						HorizontalContentAlignment="Center"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						ItemTemplate="{StaticResource ElementListItemTemplate}"
+						/>
 
-			</DockPanel>
-		</Grid>
-	</Canvas>
+				</DockPanel>
+			</Grid>
+		</Canvas>
+	</DockPanel>
 </Window>

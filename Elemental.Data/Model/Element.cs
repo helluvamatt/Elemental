@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Elemental.Model
+namespace Elemental.Data.Model
 {
 	public class Element
 	{
