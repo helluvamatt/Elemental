@@ -18,6 +18,7 @@
 				<BitmapImage x:Key="Icon_SaveAs" UriSource="/Elemental;component/icons/save_as.png" />
 				<BitmapImage x:Key="Icon_Preferences" UriSource="/Elemental;component/icons/settings.png" />
 				<BitmapImage x:Key="Icon_Quit" UriSource="/Elemental;component/icons/cancel.png" />
+				<BitmapImage x:Key="Icon_Info" UriSource="/Elemental;component/icons/info.png" />
 			</Menu.Resources>
 			
 			<MenuItem Header="Game">
@@ -52,6 +53,14 @@
 
 			<MenuItem Header="_Preferences">
 				<MenuItem IsCheckable="True" Name="MenuItem_Preferences_OnlyCombineNew" Checked="MenuItem_Preferences_OnlyCombineNew_Checked" Header="Only Combine New Elements" />
+			</MenuItem>
+			
+			<MenuItem Header="_Help">
+				<MenuItem Header="_About" Click="MenuItem_Help_About_Click">
+					<MenuItem.Icon>
+						<Image Source="{StaticResource Icon_Info}" />
+					</MenuItem.Icon>
+				</MenuItem>
 			</MenuItem>
 		</Menu>
 		<Grid>

@@ -156,6 +156,11 @@ namespace Elemental
 			Close();
 		}
 
+		private void MenuItem_Help_About_Click(object sender, RoutedEventArgs e)
+		{
+			// TODO Show about screen
+		}
+
 		private void _ElementDatabase_DatabaseError(Exception ex)
 		{
 			LoadingAnimation.Visibility = Visibility.Hidden;
