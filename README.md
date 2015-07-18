@@ -1,3 +1,5 @@
+![I](appicon.ico "Elemental")
+
 # Elemental
 An Alchemy clone for Windows
 
