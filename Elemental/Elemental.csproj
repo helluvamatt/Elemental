@@ -91,7 +91,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="icons\trash-icon.png" />
+    <Resource Include="icons\trash.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -111,6 +111,26 @@
       <Project>{aeb40ffc-82dd-45d7-ac22-1871a0a3bb0f}</Project>
       <Name>Elemental.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\save.png" />
+    <Resource Include="icons\save_as.png" />
+    <Resource Include="icons\spinner_1.png" />
+    <Resource Include="icons\spinner_2.png" />
+    <Resource Include="icons\spinner_3.png" />
+    <Resource Include="icons\spinner_4.png" />
+    <Resource Include="icons\spinner_5.png" />
+    <Resource Include="icons\spinner_6.png" />
+    <Resource Include="icons\spinner_7.png" />
+    <Resource Include="icons\spinner_8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\new.png" />
+    <Resource Include="icons\open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\cancel.png" />
+    <Resource Include="icons\settings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

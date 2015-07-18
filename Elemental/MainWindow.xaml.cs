@@ -61,7 +61,7 @@ namespace Elemental
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			// TODO Show loading
+			LoadingAnimation.Visibility = Visibility.Visible;
 			_ElementDatabase.LoadDatabaseAsync("elements.json");
 		}
 
@@ -146,9 +146,9 @@ namespace Elemental
 			DoSaveAs();
 		}
 
-		private void MenuItem_File_Preferences_Click(object sender, RoutedEventArgs e)
+		private void MenuItem_Preferences_OnlyCombineNew_Checked(object sender, RoutedEventArgs e)
 		{
-			// TODO Show preferences dialog
+			_ElementDatabase.OnlyUndiscovered = MenuItem_Preferences_OnlyCombineNew.IsChecked;
 		}
 
 		private void MenuItem_File_Quit_Click(object sender, RoutedEventArgs e)
@@ -158,13 +158,13 @@ namespace Elemental
 
 		private void _ElementDatabase_DatabaseError(Exception ex)
 		{
-			// TODO Hide loading
+			LoadingAnimation.Visibility = Visibility.Hidden;
 			MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		private void _ElementDatabase_DatabaseLoaded()
 		{
-			// TODO Hide loading
+			LoadingAnimation.Visibility = Visibility.Hidden;
 			DoNewGame();
 		}
 
