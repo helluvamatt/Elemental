@@ -158,7 +158,9 @@ namespace Elemental
 
 		private void MenuItem_Help_About_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO Show about screen
+			About aboutWindow = new About();
+			aboutWindow.Owner = this;
+			aboutWindow.ShowDialog();
 		}
 
 		private void _ElementDatabase_DatabaseError(Exception ex)
